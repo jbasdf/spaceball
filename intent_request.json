@@ -1,0 +1,26 @@
+{
+  "session": {
+    "sessionId": "SessionId.",
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.[PUT YOUR APPLICATION ID HERE]"
+    },
+    "user": {
+      "userId": ""
+    },
+    "new": true
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "",
+    "timestamp": 1447634726596,
+    "intent": {
+      "name": "SpaceBall",
+      "slots": {
+        "Date": {
+          "name": "Date",
+          "value": "2015-11-16"
+        }
+      }
+    }
+  }
+}
