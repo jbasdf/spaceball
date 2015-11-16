@@ -10,7 +10,7 @@ exports.handler = function (event, context) {
          * Uncomment this if statement and populate with your skill's application ID to
          * prevent someone else from configuring a skill that sends requests to this function.
          */
-        if (event.session.application.applicationId !== "amzn1.echo-sdk-ams.app.[PUT YOUR APPLICATION ID HERE]") {
+        if (event.session.application.applicationId !== "amzn1.echo-sdk-ams.app.[Application Id]") {
             context.fail("Invalid Application ID");
         }
 
@@ -111,9 +111,16 @@ function getWelcomeResponse(callback) {
  * Contact Nasa.
  */
 function checkNEOs(intent, session, callback) {
-    console.log("the provided date is " + intent.slots.Date)
+    console.log("the provided date is " + intent.slots.Date.value)
   var cardTitle = intent.name;
-  var date = new Date(intent.slots.Date.value).toISOString().split('T')[0];
+  var date;
+  if(intent.slots.Date.value){
+    date = new Date(intent.slots.Date.value);      
+  } else {
+    date = new Date();
+  }
+ 
+  date = date.toISOString().split('T')[0];
   
   console.log("The date is " + date);
   var repromptText = "";
@@ -121,9 +128,13 @@ function checkNEOs(intent, session, callback) {
   var shouldEndSession = true;
   var speechOutput = "";
 
+  var responses = [
+    "So no you are not going to die... not from this astroid... but don't push your luck",
+  ];
+
   getNEO(date, date, function(results){
       
-    speechOutput = "There are " + results.element_count + " objects in near earth orbit. ";
+    speechOutput = "There are " + results.element_count + " objects near the earth. ";
 
     for(var neo in results.near_earth_objects){
       var neos = results.near_earth_objects[neo];
@@ -138,7 +149,7 @@ function checkNEOs(intent, session, callback) {
         if(astroid.is_potentially_hazardous_asteroid){
           speechOutput = speechOutput + " It could kill us. Run for the hills. You're all going to die! "
         } else {
-          speechOutput = speechOutput + " It poses no threat. ";
+          speechOutput = speechOutput + " It poses no threat. " + responses[getRandomArbitrary(0, responses.length -1)];
         }
       }
     }
@@ -149,6 +160,9 @@ function checkNEOs(intent, session, callback) {
 
 }
 
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 // --------------- Helpers that build all of the responses -----------------------
 
@@ -181,7 +195,7 @@ function buildResponse(sessionAttributes, speechletResponse) {
     };
 }
 
-// Don't use the demo key in production. Get a real key from https://api.nasa.gov/index.html#apply-for-an-api-key
+// Don't use demo key in production. Get a key from https://api.nasa.gov/index.html#apply-for-an-api-key
 function getNEO(startDate, endDate, callback) {
   return https.get({
     host: 'api.nasa.gov',
